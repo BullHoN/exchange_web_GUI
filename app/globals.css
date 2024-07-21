@@ -2,32 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+.custom-sidebar > div {
+	background-color: #002350;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+.custom-sidebar-item {
+	color: white;
+	background-color: darkblue;
+	/* Optionally, you can add more styles, such as hover effects */
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+.custom-sidebar-item:hover {
+	background-color: navy;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.active-sidebar-item {
+	background-color: #d9b800;
 }
