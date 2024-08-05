@@ -12,10 +12,15 @@ class Authenticating extends State{
         this.connection_layer_termination_method = params.connection_layer_termination_method
         this.intent_handler = params.intent_handler
         this.logger = params.logger
+        this.connect_delay = params.connect_delay
     }
 
     onEntry(){
-        this.authentication_method(this.auth_params)
+        if (0 === this.connect_delay) {
+            this.authentication_method(this.auth_params)
+        } else {
+            setTimeout(()=>{this.authentication_method(this.auth_params)}, this.connect_delay)
+        }
     }
 
     on_disconnect(reason){
@@ -61,14 +66,14 @@ class ConnectingToFeedServer extends State{
         }
         catch(err){
             this.logger.warn(err.message)
-            return new Authenticating(this.authentication_params)
+            return new Authenticating({...this.authentication_params, connect_delay : 5000})
         }
 
     }
 
     on_disconnect(err) {
         this.logger.warn(err.message)
-        return new Authenticating(this.authentication_params)
+        return new Authenticating({...this.authentication_params, connect_delay : 5000})
     }
 
     on_client_intent(intent) {
@@ -104,7 +109,7 @@ class Operational extends State{
 
     on_disconnect(reason){
         this.logger.warn(`Disconnection evt received, reason: ${reason}`)
-        return new Authenticating(this.authentication_params)
+        return new Authenticating({...this.authentication_params, connect_delay : 5000})
     }
 
     on_auth_response(response){

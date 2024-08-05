@@ -35,9 +35,15 @@ export default function Component() {
 	);
 
 	useEffect(() => {
-		setFilteredDestinationSymbol(
-			activeExchange ? Object.keys(exchanges[activeExchange].symbols) : []
-		);
+
+		// if(activeExchange){
+			// const uniqueBaseAssests = [ new Set(Object.keys(exchanges[activeExchange].symbols).map((symbol) => exchanges[activeExchange].symbols[symbol].baseAsset))]
+		
+			setFilteredDestinationSymbol(
+				activeExchange ? Object.keys(exchanges[activeExchange].symbols) : []
+			);
+
+		// }
 	}, [activeExchange]);
 
 	const addBucketSymbol = (newBucketSymbol) => {
@@ -75,9 +81,7 @@ export default function Component() {
 			addSubscription(subscriptionTypeEnum.BASKETS, {
 				symbol: symbolId,
 				assets: bucketSymbols,
-				destinationSymbol:
-					exchanges[activeExchange].symbols[destinationSymbol]
-						.baseAsset,
+				destinationSymbol:destinationSymbol,
 			});
 
 			setBucketSymbols([]);
@@ -91,8 +95,8 @@ export default function Component() {
 					<div className='flex items-start'>
 						<div>
 							<label
-								for='countries'
-								class='block mb-2 text-lg font-medium text-gray-900 dark:text-white'
+								htmlFor='countries'
+								className='block mb-2 text-lg font-medium text-gray-900 dark:text-white'
 							>
 								Select Bucket
 							</label>
@@ -125,20 +129,21 @@ export default function Component() {
 						<div className='flex items-end'>
 							<div className='ml-12'>
 								<label
-									for='countries'
-									class='block mb-2 text-lg font-medium text-gray-900 dark:text-white'
+									htmlFor='countries'
+									className='block mb-2 text-lg font-medium text-gray-900 dark:text-white'
 								>
-									Select an Symbol
+									Select an Asset
 								</label>
 								<Autocomplete
 									disabled={disableDestinationSymbol}
 									disablePortal
 									id='combo-box-demo'
 									onChange={handleDestinationSymbolChange}
-									options={filteredDestinationSymbol}
+									options={filteredDestinationSymbol.map((symbol) => exchanges[activeExchange].symbols[symbol]
+										.baseAsset)}
 									sx={{ width: 300 }}
 									renderInput={(params) => (
-										<TextField {...params} label='Symbol' />
+										<TextField {...params} label='Asset' />
 									)}
 								/>
 							</div>
@@ -146,11 +151,11 @@ export default function Component() {
 							<button
 								onClick={handleAddSubscription}
 								type='button'
-								class='ml-12 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+								className='ml-12 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
 							>
 								Add
 								<svg
-									class='rtl:rotate-180 w-3.5 h-3.5 ms-2'
+									className='rtl:rotate-180 w-3.5 h-3.5 ms-2'
 									aria-hidden='true'
 									xmlns='http://www.w3.org/2000/svg'
 									fill='none'
@@ -158,9 +163,9 @@ export default function Component() {
 								>
 									<path
 										stroke='currentColor'
-										stroke-linecap='round'
-										stroke-linejoin='round'
-										stroke-width='2'
+										strokeLinecap='round'
+										strokeLinejoin='round'
+										strokeWidth='2'
 										d='M1 5h12m0 0L9 1m4 4L9 9'
 									/>
 								</svg>

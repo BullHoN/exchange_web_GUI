@@ -106,8 +106,34 @@ function connect(serverAddress, libLogger){//Server address <ip>:<port>
     actionAntiAction = new ActionAntiAction(libLogger) 
     logger = libLogger
     requestSerializer = new RequestSerializers()
-    logger.debug(`Connecting to the server ${serverAddress}`)
-    sock = io(serverAddress, {reconnection: false})
+    logger.debug(`Connecting to the server ${JSON.stringify(serverAddress)}`)
+    sock = io(serverAddress.url,
+              {
+                path: serverAddress.path,
+                // path: '/long_polling',
+                // transportOptions: {
+                //     websocket: {
+                //       path: "/ws/"
+                //     }
+                // },                
+                // transports: ['websocket'],
+                //secure: window.location.protocol === 'https:',
+                //rejectUnauthorized: false, // This is often necessary for self-signed certificates
+                reconnection: false,
+                // transportOptions: {
+                //     polling: {
+                //         extraHeaders: {
+                //             'x_Backend_Port': '65'  // Set the desired backend port
+                //         }
+                //     }
+                // },
+                // extraHeaders: {
+                //     "x_Backend_Port": "65"
+                //   }
+                //secure: true
+              }
+            )
+
     sock.on('connect', ()=>{
         logger.debug(`Connected by id: ${sock.id}, syncing subscriptions`)
         subscriptionBook.forEach((evt, key)=>{

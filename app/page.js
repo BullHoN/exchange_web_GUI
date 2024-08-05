@@ -6,12 +6,12 @@ export default function Home() {
 
 	if (isReady) {
 		return (
-			<section class='bg-white dark:bg-gray-900'>
-				<div class='py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16'>
-					<h1 class='mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white'>
+			<section className='bg-white dark:bg-gray-900'>
+				<div className='py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16'>
+					<h1 className='mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white'>
 						We invest in the world’s potential
 					</h1>
-					<p class='mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 lg:px-48 dark:text-gray-400'>
+					<p className='mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 lg:px-48 dark:text-gray-400'>
 						Welcome to QuantHulk, your one-stop destination for the
 						best tools in cryptocurrency trading and management.
 						Explore our comprehensive suite of utilities designed to
@@ -23,11 +23,11 @@ export default function Home() {
 		);
 	} else {
 		return (
-			<div class='flex items-center justify-center w-full h-full border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700'>
+			<div className='flex items-center justify-center w-full h-full border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700'>
 				<div role='status'>
 					<svg
 						aria-hidden='true'
-						class='w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600'
+						className='w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600'
 						viewBox='0 0 100 101'
 						fill='none'
 						xmlns='http://www.w3.org/2000/svg'
@@ -41,7 +41,7 @@ export default function Home() {
 							fill='currentFill'
 						/>
 					</svg>
-					<span class='sr-only'>Loading...</span>
+					<span className='sr-only'>Loading...</span>
 				</div>
 			</div>
 		);

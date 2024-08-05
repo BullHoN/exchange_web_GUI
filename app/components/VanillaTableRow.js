@@ -28,6 +28,7 @@ export default function SubscriptionTableRow(props) {
 		asks: [],
 	});
 
+	let lastPrice = 0;
 	const handleSymbolUnsubscription = () => {
 		unsubscribe(
 			props.currentTAB,
@@ -95,10 +96,11 @@ export default function SubscriptionTableRow(props) {
 
 	const tradeCallback = useCallback((data) => {
 		setCurrSub({
-			lastPrice: currSub.price,
+			lastPrice: lastPrice,
 			price: data.price,
 			quantity: data.quantity,
 		});
+		lastPrice = data.price;
 	}, []);
 
 	useEffect(() => {
@@ -176,14 +178,13 @@ export default function SubscriptionTableRow(props) {
 	// 	console.log('active exchane has changed inside subscribe val');
 	// }, []);
 
-	// console.log('depth', props.subsciption);
+	// console.log('price', lastPrice);
 
 	if (props.currentTAB == subscriptionTypeEnum.VANILLA) {
 		return (
 			<>
 				<div className='my-2 flex items-center w-full p-5 font-medium rtl:text-right text-gray-500 border border-gray-300 rounded-md focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3'>
 					<div className='w-1/4'>{symbol}</div>
-					<div className='w-1/4'>{currSub.price}</div>
 					<div
 						className={
 							currSub.price >= currSub.lastPrice
@@ -199,6 +200,7 @@ export default function SubscriptionTableRow(props) {
 
 						{currSub.price}
 					</div>
+					<div className='w-1/4'>{currSub.quantity}</div>
 					<div className='w-1/4'>
 						<button
 							onClick={handleDepthSubscription}
@@ -210,7 +212,7 @@ export default function SubscriptionTableRow(props) {
 						<button
 							onClick={handleSymbolUnsubscription}
 							type='button'
-							class='focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900'
+							className='focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900'
 						>
 							Remove
 						</button>
@@ -224,7 +226,7 @@ export default function SubscriptionTableRow(props) {
 						showDepth ? 'visible border border-blue-950' : 'hidden'
 					}
 				>
-					<div class='relative overflow-x-auto'>
+					<div className='relative overflow-x-auto'>
 						<div className='flex px-6 py-2 bg-[#002350] text-white'>
 							<p
 								style={{
@@ -245,19 +247,19 @@ export default function SubscriptionTableRow(props) {
 								Asks
 							</p>
 						</div>
-						<table class='w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400'>
-							<thead class='text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
+						<table className='w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400'>
+							<thead className='text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
 								<tr>
-									<th scope='col' class='px-6 py-3'>
+									<th scope='col' className='px-6 py-3'>
 										Price
 									</th>
-									<th scope='col' class='px-6 py-3'>
+									<th scope='col' className='px-6 py-3'>
 										Quantity
 									</th>
-									<th scope='col' class='px-6 py-3'>
+									<th scope='col' className='px-6 py-3'>
 										Price
 									</th>
-									<th scope='col' class='px-6 py-3'>
+									<th scope='col' className='px-6 py-3'>
 										Quantity
 									</th>
 								</tr>
@@ -271,18 +273,18 @@ export default function SubscriptionTableRow(props) {
 										return (
 											<tr
 												key={idx}
-												class='bg-white border-b dark:bg-gray-800 dark:border-gray-700'
+												className='bg-white border-b dark:bg-gray-800 dark:border-gray-700'
 											>
-												<td class='px-6 py-1 text-green-600'>
+												<td className='px-6 py-1 text-green-600'>
 													{bid[0]}
 												</td>
-												<td class='px-6 py-1'>
+												<td className='px-6 py-1'>
 													{bid[1]}
 												</td>
-												<td class='px-6 py-1 text-red-600'>
+												<td className='px-6 py-1 text-red-600'>
 													{depths.asks[idx][0]}
 												</td>
-												<td class='px-6 py-1'>
+												<td className='px-6 py-1'>
 													{depths.asks[idx][1]}
 												</td>
 											</tr>

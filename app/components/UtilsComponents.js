@@ -8,11 +8,11 @@ export function UpArrow() {
 			xmlns='http://www.w3.org/2000/svg'
 			stroke='#00db42'
 		>
-			<g id='SVGRepo_bgCarrier' stroke-width='0'></g>
+			<g id='SVGRepo_bgCarrier' strokeWidth='0'></g>
 			<g
 				id='SVGRepo_tracerCarrier'
-				stroke-linecap='round'
-				stroke-linejoin='round'
+				strokeLinecap='round'
+				strokeLinejoin='round'
 			></g>
 			<g id='SVGRepo_iconCarrier'>
 				<path d='M21,21H3L12,3Z'></path>
@@ -32,11 +32,11 @@ export function DownArrow() {
 			stroke='#ff0000'
 			transform='rotate(180)'
 		>
-			<g id='SVGRepo_bgCarrier' stroke-width='0'></g>
+			<g id='SVGRepo_bgCarrier' strokeWidth='0'></g>
 			<g
 				id='SVGRepo_tracerCarrier'
-				stroke-linecap='round'
-				stroke-linejoin='round'
+				strokeLinecap='round'
+				strokeLinejoin='round'
 			></g>
 			<g id='SVGRepo_iconCarrier'>
 				<path d='M21,21H3L12,3Z'></path>

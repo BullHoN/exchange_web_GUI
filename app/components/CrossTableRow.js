@@ -15,11 +15,13 @@ export default function CrossTableRow(props) {
 	);
 	const [currSub, setCurrSub] = useState({ price: 0, lastPrice: 0 });
 
+	let lastPrice = 0
 	const tradeCallback = useCallback((data) => {
 		setCurrSub({
-			lastPrice: currSub.price,
+			lastPrice: lastPrice,
 			price: data.price,
 		});
+		lastPrice = data.price
 	}, []);
 
 	const handleSymbolUnsubscription = () => {

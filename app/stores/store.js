@@ -61,9 +61,7 @@ const HulkStore = (set, get) => ({
 			init(
 				{
 					auth_server: [
-						'http://165.232.187.129:90',
-						'http://143.244.139.3:90',
-						'http://143.244.131.67:90',
+						'https://thecrypticprices.com',
 					],
 					credentials: { user: 'test_user', password: 'test_pwd' },
 				},

@@ -1,4 +1,4 @@
-const https = require('react-http-client')
+const axios = require('axios')
 const { ClientLayerFSM } = require("./StateMachine/ClientLayerFSM")
 const Validator = require("./ValidatorLayer/Validator")
 const NetworkServices = require("./NetworkLayer/RequestForwarder")
@@ -8,20 +8,26 @@ let fsm = null
 
 function start(auth_params, logger){
     fsm = new ClientLayerFSM({auth_params : auth_params,
+                              connect_delay : 0,
                               authentication_method : (auth_params)=>{ 
                                                                         let currServerIndex = 0
                                                                         const func = ()=>{
                                                                         const authServers = auth_params.auth_server
                                                                         const numAuthServers = authServers.length
                                                                         const url = authServers[currServerIndex] + "/auth/" + JSON.stringify(auth_params.credentials)
-                                                                        https.get(url)
-                                                                        .then(data => {
+                                                                        axios.get(url)
+                                                                        .then(resData => {
+                                                                          const data = resData.data;
                                                                           logger.debug(`Response from auth_server: ${JSON.stringify(data)}`)
                                                                           //data = JSON.parse(res)
                                                                           //logger.debug(data)
                                                                           try{
                                                                             if(data.success){
-                                                                              fsm.handleEvent("auth_response", {success: true, conn_params : "http://" + data.feed_server})
+                                                                              const url = "https://" + data.feed_server.replace("www.","");
+                                                                              const urlObj = (new URL(url));
+                                                                              const path = urlObj.pathname
+
+                                                                              fsm.handleEvent("auth_response", {success: true, conn_params : {url: urlObj.hostname, path: path}})
                                                                             } else if (data.code === constants.error_codes.no_feed_server) {
                                                                               const retryInterval = 5000
                                                                               logger.warn(`No feed server provided from authenticator, retrying in ${retryInterval} ms`);
