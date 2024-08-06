@@ -3,7 +3,7 @@ const Event = CommonUtils.Event
 
 let subscriptionBook = new Map()
 function subscribeList(symbols, exchange, vanillaSubscriptionFunction, callback) {
-    const key = JSON.stringify(...symbols, exchange)
+    const key = JSON.stringify([...symbols, exchange])
     let matter = subscriptionBook.get(key)
     if (undefined === matter) {
         const symbolToIndex = new Map()
@@ -41,7 +41,7 @@ function subscribeList(symbols, exchange, vanillaSubscriptionFunction, callback)
 }
 
 function unsubscribeList(symbols, exchange, vanillaUnsubscriptionFunction, callback) {
-    const key = JSON.stringify(...symbols, exchange)
+    const key = JSON.stringify([...symbols, exchange])
     const matter = subscriptionBook.get(key)
     if (undefined === matter) {
         throw new Error(`Spurious unsubscription for key: ${key}`)
