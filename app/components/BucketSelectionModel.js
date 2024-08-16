@@ -85,7 +85,7 @@ export default function BucketSelectionModel({
 		if (val != null && val != '') {
 			setCurrentBucketSymbol({
 				...currentBucketSymbol,
-				count: Number.parseInt(val),
+				count: Number.parseFloat(val),
 			});
 		} else {
 			setCurrentBucketSymbol({
@@ -142,7 +142,9 @@ export default function BucketSelectionModel({
 							id='number-input'
 							aria-describedby='helper-text-explanation'
 							className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-							placeholder='2'
+							placeholder='1'
+							step={0.0000000000001}
+							min={0}
 							required
 						/>
 					</div>

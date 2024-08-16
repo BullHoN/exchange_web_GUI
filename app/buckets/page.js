@@ -35,13 +35,12 @@ export default function Component() {
 	);
 
 	useEffect(() => {
-
 		// if(activeExchange){
-			// const uniqueBaseAssests = [ new Set(Object.keys(exchanges[activeExchange].symbols).map((symbol) => exchanges[activeExchange].symbols[symbol].baseAsset))]
-		
-			setFilteredDestinationSymbol(
-				activeExchange ? Object.keys(exchanges[activeExchange].symbols) : []
-			);
+		// const uniqueBaseAssests = [ new Set(Object.keys(exchanges[activeExchange].symbols).map((symbol) => exchanges[activeExchange].symbols[symbol].baseAsset))]
+
+		setFilteredDestinationSymbol(
+			activeExchange ? Object.keys(exchanges[activeExchange].symbols) : []
+		);
 
 		// }
 	}, [activeExchange]);
@@ -74,14 +73,14 @@ export default function Component() {
 		if (destinationSymbol != null && bucketSymbols.length > 0) {
 			const symbolId =
 				bucketSymbols.reduce(
-					(total, val) => (total += val.baseAsset + '-'),
+					(total, val) => (total += val.baseAsset + val.count + '-'),
 					''
 				) + destinationSymbol;
 
 			addSubscription(subscriptionTypeEnum.BASKETS, {
 				symbol: symbolId,
 				assets: bucketSymbols,
-				destinationSymbol:destinationSymbol,
+				destinationSymbol: destinationSymbol,
 			});
 
 			setBucketSymbols([]);
@@ -139,8 +138,12 @@ export default function Component() {
 									disablePortal
 									id='combo-box-demo'
 									onChange={handleDestinationSymbolChange}
-									options={filteredDestinationSymbol.map((symbol) => exchanges[activeExchange].symbols[symbol]
-										.baseAsset)}
+									options={filteredDestinationSymbol.map(
+										(symbol) =>
+											exchanges[activeExchange].symbols[
+												symbol
+											].baseAsset
+									)}
 									sx={{ width: 300 }}
 									renderInput={(params) => (
 										<TextField {...params} label='Asset' />

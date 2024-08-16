@@ -3,6 +3,7 @@ import './globals.css';
 import { SideNavbar } from './components/SideNav';
 import { NavBarComp } from './components/Navbar';
 import { InitConection } from './components/Init';
+import { ErrorMessageDialog } from './components/ErrorMessageDialog';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -22,6 +23,7 @@ export default function RootLayout({ children }) {
 			</head>
 			<body className={inter.className}>
 				<InitConection />
+				<ErrorMessageDialog />
 				<div className='flex h-screen'>
 					<SideNavbar />
 					<div className='ml-64 w-full'>

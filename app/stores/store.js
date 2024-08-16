@@ -48,65 +48,170 @@ export const logger = {
 	error: (str) => console.log(str),
 };
 
+const initErrorCB = (autParameters, logger, staticDataCB, errorCB) => {
+	try {
+		init(autParameters, logger, staticDataCB);
+	} catch (error) {
+		errorCB(error);
+	}
+};
+
+const subscribeErrorCB = (symbol, exchange, subsType, cb, errorCB) => {
+	try {
+		subscribe(symbol, exchange, subsType, cb);
+	} catch (error) {
+		errorCB(error);
+	}
+};
+
+const unsubscribeErrorCB = (symbol, exchange, subsType, cb, errorCB) => {
+	try {
+		unsubscribe(symbol, exchange, subsType, cb);
+	} catch (err) {
+		errorCB(err);
+	}
+};
+
+const subscribeVirtualErrorCB = (
+	asset,
+	currency,
+	bridge,
+	exchange,
+	callback,
+	errorCB
+) => {
+	try {
+		subscribeVirtual(asset, currency, bridge, exchange, callback);
+	} catch (error) {
+		errorCB(error);
+	}
+};
+
+const unSubscribeVirtualErrorCB = (
+	asset,
+	currency,
+	bridge,
+	exchange,
+	callback,
+	errorCB
+) => {
+	try {
+		unsubscribeVirtual(asset, currency, bridge, exchange, callback);
+	} catch (error) {
+		errorCB(error);
+	}
+};
+
+const subscribeBasketErrorCB = (
+	assets,
+	coefficients,
+	bridgeCurrency,
+	targetAsset,
+	exchange,
+	callback,
+	errorCB
+) => {
+	try {
+		subscribeBasket(
+			assets,
+			coefficients,
+			bridgeCurrency,
+			targetAsset,
+			exchange,
+			callback
+		);
+	} catch (error) {
+		errorCB(error);
+	}
+};
+
+const unSubscribeBasketErrorCB = (
+	assets,
+	coefficients,
+	bridgeCurrency,
+	targetAsset,
+	exchange,
+	callback,
+	errorCB
+) => {
+	try {
+		unsubscribeBasket(
+			assets,
+			coefficients,
+			bridgeCurrency,
+			targetAsset,
+			exchange,
+			callback
+		);
+	} catch (error) {
+		errorCB(error);
+	}
+};
+
+// const errorCallback = (setState) => {
+// 	return (error) => {
+// 		setState((state) => {
+// 			return { errors: [...state.errors, error] };
+// 		});
+// 	};
+// };
+
 const HulkStore = (set, get) => ({
 	subscriptions: null,
 	exchanges: {},
 	activeExchange: null,
 	isReady: false,
+	errors: [],
 
 	init: () => {
 		console.log('initilize everything');
 
-		try {
-			init(
-				{
-					auth_server: [
-						'https://thecrypticprices.com',
-					],
-					credentials: { user: 'test_user', password: 'test_pwd' },
-				},
-				logger,
-				(meta) => {
-					// create subscription object
-					const symbolDict = meta.allowed_instruments;
-					const allowed_exchanges = meta.allowed_exchanges;
+		initErrorCB(
+			{
+				auth_server: ['https://thecrypticprices.com'],
+				credentials: { user: 'test_user', password: 'test_pwd' },
+			},
+			logger,
+			(meta) => {
+				// create subscription object
+				const symbolDict = meta.allowed_instruments;
+				const allowed_exchanges = meta.allowed_exchanges;
 
-					const reducedSymbolDict = {};
+				const reducedSymbolDict = {};
 
-					for (let [key, value] of symbolDict) {
-						if (!reducedSymbolDict[`${value.exchange}`])
-							reducedSymbolDict[`${value.exchange}`] = {};
-						reducedSymbolDict[`${value.exchange}`][value.symbol] =
-							value;
-					}
-
-					set((state) => ({
-						exchanges: allowed_exchanges.reduce((total, temp) => {
-							total[`${temp}`] = {
-								symbols: reducedSymbolDict[`${temp}`]
-									? reducedSymbolDict[`${temp}`]
-									: [],
-							};
-							return total;
-						}, {}),
-						subscriptions: allowed_exchanges.reduce(
-							(total, temp) => {
-								total[`${temp}`] = {
-									vanilla: [],
-									crossPrices: [],
-									baskets: [],
-								};
-								return total;
-							},
-							{}
-						),
-						isReady: true,
-					}));
+				for (let [key, value] of symbolDict) {
+					if (!reducedSymbolDict[`${value.exchange}`])
+						reducedSymbolDict[`${value.exchange}`] = {};
+					reducedSymbolDict[`${value.exchange}`][value.symbol] =
+						value;
 				}
-			);
-		} catch (error) {
-			throw Error('Cannot Connect with server');
-		}
+
+				set((state) => ({
+					exchanges: allowed_exchanges.reduce((total, temp) => {
+						total[`${temp}`] = {
+							symbols: reducedSymbolDict[`${temp}`]
+								? reducedSymbolDict[`${temp}`]
+								: [],
+						};
+						return total;
+					}, {}),
+					subscriptions: allowed_exchanges.reduce((total, temp) => {
+						total[`${temp}`] = {
+							vanilla: [],
+							crossPrices: [],
+							baskets: [],
+						};
+						return total;
+					}, {}),
+					isReady: true,
+				}));
+			},
+			(error) => {
+				setState((state) => {
+					return { errors: [...state.errors, error] };
+				});
+			}
+		);
 	},
 
 	changeActiveExchange: (newActiveExchange) => {
@@ -244,17 +349,41 @@ const HulkStore = (set, get) => ({
 	},
 
 	subscribe: (type, symbol, exchange, subsType, cb, subsObject = {}) => {
+		const errorCallback = (error) => {
+			set((state) => {
+				const exchange = state.activeExchange;
+				let newSubInActiveExchange = [
+					...state.subscriptions[exchange][type],
+				];
+				newSubInActiveExchange = newSubInActiveExchange.filter(
+					(val) => val.symbol != symbol
+				);
+
+				return {
+					subscriptions: {
+						...state.subscriptions,
+						[exchange]: {
+							...state.subscriptions[exchange],
+							[type]: newSubInActiveExchange,
+						},
+					},
+					errors: [...state.errors, error],
+				};
+			});
+		};
+
 		switch (type) {
 			case subscriptionTypeEnum.VANILLA:
-				subscribe(symbol, exchange, subsType, cb);
+				subscribeErrorCB(symbol, exchange, subsType, cb, errorCallback);
 				break;
 			case subscriptionTypeEnum.CROSS_PRICE:
-				subscribeVirtual(
+				subscribeVirtualErrorCB(
 					subsObject.baseAssets[0],
 					subsObject.baseAssets[1],
 					subsObject.quoteAsset,
 					exchange,
-					cb
+					cb,
+					errorCallback
 				);
 				break;
 			case subscriptionTypeEnum.BASKETS:
@@ -266,13 +395,14 @@ const HulkStore = (set, get) => ({
 					cofficeints.push(sub.count);
 				});
 
-				subscribeBasket(
+				subscribeBasketErrorCB(
 					assets,
 					cofficeints,
 					subsObject.assets[0].quoteAsset,
 					subsObject.destinationSymbol,
 					exchange,
-					cb
+					cb,
+					errorCallback
 				);
 				break;
 			default:
@@ -310,17 +440,30 @@ const HulkStore = (set, get) => ({
 	},
 
 	unsubscribe: (type, symbol, exchange, subsType, cb, subsObject = {}) => {
+		const errorCallback = (error) => {
+			set((state) => {
+				return { errors: [...state.errors, error] };
+			});
+		};
+
 		switch (type) {
 			case subscriptionTypeEnum.VANILLA:
-				unsubscribe(symbol, exchange, subsType, cb);
+				unsubscribeErrorCB(
+					symbol,
+					exchange,
+					subsType,
+					cb,
+					errorCallback
+				);
 				break;
 			case subscriptionTypeEnum.CROSS_PRICE:
-				unsubscribeVirtual(
+				unSubscribeVirtualErrorCB(
 					subsObject.baseAssets[0],
 					subsObject.baseAssets[1],
 					subsObject.quoteAsset,
 					exchange,
-					cb
+					cb,
+					errorCallback
 				);
 				break;
 			case subscriptionTypeEnum.BASKETS:
@@ -332,13 +475,14 @@ const HulkStore = (set, get) => ({
 					cofficeints.push(sub.count);
 				});
 
-				unsubscribeBasket(
+				unSubscribeBasketErrorCB(
 					assets,
 					cofficeints,
 					subsObject.assets[0].quoteAsset,
 					subsObject.destinationSymbol,
 					exchange,
-					cb
+					cb,
+					errorCallback
 				);
 				break;
 			default:
@@ -380,33 +524,41 @@ const HulkStore = (set, get) => ({
 	unsubscribeAllInActive: (activeExchange, subs) => {
 		// unsubscribe all the exsisting subs
 		console.log('unsubsrrine all current once');
+
+		const errorCallback = (error) => {
+			console.log('error occured while unsubscribing', error.message);
+		};
+
 		subs[activeExchange].vanilla.forEach((sub) => {
 			if (sub.cb)
-				unsubscribe(
+				unsubscribeErrorCB(
 					sub.symbol,
 					activeExchange,
 					subsTypeEnum.TRADE,
-					sub.cb
+					sub.cb,
+					errorCallback
 				);
 
 			if (sub.depth_cb) {
-				unsubscribe(
+				unsubscribeErrorCB(
 					sub.symbol,
 					activeExchange,
 					subsTypeEnum.DEPTH,
-					sub.depth_cb
+					sub.depth_cb,
+					errorCallback
 				);
 			}
 		});
 
 		subs[activeExchange].crossPrices.forEach((sub) => {
 			if (sub.cb)
-				unsubscribeVirtual(
+				unSubscribeVirtualErrorCB(
 					sub.baseAssets[0],
 					sub.baseAssets[1],
 					sub.quoteAsset,
 					activeExchange,
-					sub.cb
+					sub.cb,
+					errorCallback
 				);
 		});
 
@@ -420,15 +572,22 @@ const HulkStore = (set, get) => ({
 					cofficeints.push(sub.count);
 				});
 
-				unsubscribeBasket(
+				unSubscribeBasketErrorCB(
 					assets,
 					cofficeints,
 					subsObject.assets[0].quoteAsset,
 					subsObject.destinationSymbol,
 					activeExchange,
-					subsObject.cb
+					subsObject.cb,
+					errorCallback
 				);
 			}
+		});
+	},
+
+	clearErrors: () => {
+		set((state) => {
+			return { errors: [] };
 		});
 	},
 });
