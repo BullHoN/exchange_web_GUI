@@ -27,10 +27,31 @@ class RequestSerializers{
 function subscribe(symbol, exchange, type, callback){
     const key = JSON.stringify([symbol, exchange, type])
 
-    let evt = subscriptionBook.get(key)
-    if (undefined === evt) {
-        evt = new Event()
-        subscriptionBook.set(key, evt)
+    let matter = subscriptionBook.get(key)
+    if (undefined === matter) {
+        const updateEvt = new Event()
+        let timerFired = false
+        let latestUpdate = null
+        matter =
+        {
+            updator :  (update) => {
+                            latestUpdate = update
+                            if (!timerFired)
+                            {
+                                const func = () =>{
+                                    if(!updateEvt.empty()) {
+                                        updateEvt.raise(latestUpdate)
+                                        setTimeout(func, 1000)
+                                        timerFired = true
+                                    }
+                                }
+                                func();
+                            }
+                        },
+            evt :       updateEvt
+        }
+
+        subscriptionBook.set(key, matter)
         actionAntiAction.antiAct(key, ()=>{
             requestSerializer.requestToSend(key, sock, 'subscribe', (result)=>{
                 if(result.success) {            
@@ -42,18 +63,18 @@ function subscribe(symbol, exchange, type, callback){
         })
     }
     
-    evt.registerCallback(callback)
+    matter.evt.registerCallback(callback)
 }
 
 function unsubscribe(symbol, exchange, type, callback){
     const key = JSON.stringify([symbol, exchange, type])
-    let evt = subscriptionBook.get(key)
-    if (undefined === evt) {
+    let matter = subscriptionBook.get(key)
+    if (undefined === matter) {
         throw new Error(`Spurious unsubscription for key: ${key}`)
     }
 
-    evt.unregisterCallback(callback)
-    if (evt.empty()) {
+    matter.evt.unregisterCallback(callback)
+    if (matter.evt.empty()) {
         subscriptionBook.delete(key)
         actionAntiAction.act(key, 10000, ()=>{
             requestSerializer.requestToSend(key,
@@ -156,18 +177,18 @@ function connect(serverAddress, libLogger){//Server address <ip>:<port>
     sock.on("depth", (depth)=>{
         const depthJSon = JSON.parse(depth)
         const key = JSON.stringify([depthJSon.symbol, depthJSon.exchange, "depth"])
-        const evt = subscriptionBook.get(key);
-        if (undefined !== evt) {
-            evt.raise(depthJSon)
+        const matter = subscriptionBook.get(key);
+        if (undefined !== matter) {
+            matter.updator(depthJSon)
         }
     })
 
     sock.on("trade", (trade)=>{
         const tradeJSon = JSON.parse(trade)
         const key = JSON.stringify([tradeJSon.symbol, tradeJSon.exchange, "trade"])
-        const evt = subscriptionBook.get(key);
-        if (undefined !== evt) {
-            evt.raise(tradeJSon)
+        const matter = subscriptionBook.get(key);
+        if (undefined !== matter) {
+            matter.updator(tradeJSon)
         }
     })
 
