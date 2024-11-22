@@ -38,7 +38,7 @@ export default function VanillaSubscriptionCollasableTable({
 									currentTAB={currentTAB}
 									activeExchange={activeExchange}
 									subsciption={data}
-									key={idx}
+									key={data.symbol}
 								/>
 							);
 						}
@@ -65,7 +65,7 @@ export default function VanillaSubscriptionCollasableTable({
 									currentTAB={currentTAB}
 									activeExchange={activeExchange}
 									subsciption={data}
-									key={idx}
+									key={data.symbol}
 								/>
 							);
 						}
@@ -92,7 +92,7 @@ export default function VanillaSubscriptionCollasableTable({
 									currentTAB={currentTAB}
 									activeExchange={activeExchange}
 									subsciption={data}
-									key={idx}
+									key={data.symbol}
 								/>
 							);
 						}
