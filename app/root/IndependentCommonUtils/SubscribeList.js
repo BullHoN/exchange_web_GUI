@@ -14,6 +14,7 @@ function subscribeList(symbols, exchange, vanillaSubscriptionFunction, callback)
         const prices = new Array(symbols.length).fill(null)
         const priceEvt = new Event()
         let allUpdatesReceived = false;
+        let priceTimerFired = false
         matter =
         {
             listUpdator : update=>{
@@ -24,8 +25,16 @@ function subscribeList(symbols, exchange, vanillaSubscriptionFunction, callback)
                                     return prev && (price !== null)
                                 },true)
                             
-                            if(allUpdatesReceived) {
-                                priceEvt.raise(prices)
+                            if(allUpdatesReceived && !priceTimerFired) {
+                                const func = () => {
+                                    if (!priceEvt.empty()) {
+                                        priceEvt.raise(prices)
+                                        setTimeout(func, 1000)
+                                        priceTimerFired = true
+                                    }
+                                }
+
+                                func()
                             }
                           },
             evt         : priceEvt
